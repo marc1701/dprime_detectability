@@ -1,5 +1,4 @@
 import numpy as np
-import soundfile as sf
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -123,7 +122,9 @@ class DPrimeDetectability(object):
         sns.heatmap(df, vmin=vmin)
 
 
-def third_octave_spl(x, fs, delta_t, freq_limits=[30, 4000]):
+def third_octave_spl(x, fs, delta_t, freq_limits=None):
+    if freq_limits is None:
+        freq_limits = [30, 4000]
     delta_t_samples = int(fs * delta_t)
 
     # split input into frames based on time window
@@ -139,4 +140,3 @@ def third_octave_spl(x, fs, delta_t, freq_limits=[30, 4000]):
         spl_frames.append(spl)
     spl_frames = np.array(spl_frames)
     return spl_frames
-# third_octave_spl wants taking out of here so custom maskers can be input
