@@ -12,7 +12,8 @@ def _spl_db_to_pa(db):
 class DPrimeDetectability(object):
     def __init__(self,
                  signal,
-                 masker,
+                 masker=None,
+                 masker_static=None,
                  fs=48000,
                  freq_limits=None,
                  eta=0.3,
@@ -21,14 +22,6 @@ class DPrimeDetectability(object):
                  delta=14,
                  rho=1):
 
-        if signal.ndim != 1:
-            signal = signal[:, 0]
-
-        if masker.ndim != 1:
-            masker = masker[:, 0]
-
-        self.signal = signal
-        self.masker = masker
         self.fs = fs
         self.delta_t = delta_t
         self.alpha = alpha
@@ -42,9 +35,19 @@ class DPrimeDetectability(object):
         self.f_c = freq_bands[0]
         self.freqband_width = np.diff(freq_bands[1:], axis=0)
 
-        # calculate and store third-octave spectrograms
+        if signal.ndim != 1:
+            signal = signal[:, 0]
+
+        if masker_static is None and masker.ndim != 1:
+            masker = masker[:, 0]
+
+        self.signal = signal
         self.signal_spectrogram = self.third_octave_spl(signal)
-        self.masker_spectrogram = self.third_octave_spl(masker)
+        if masker_static is None:
+            self.masker = masker
+            self.masker_spectrogram = self.third_octave_spl(masker)
+        else:  # allow for 'static' average spectrum rather than 'live' spectrogram masker
+            self.masker_spectrogram = np.array([masker_static] * len(self.signal_spectrogram))
 
         # calculate detection efficiency curve
         self.auditory_filter_width = 24.7 * (1 + (4.37 / 1000) * self.f_c)
