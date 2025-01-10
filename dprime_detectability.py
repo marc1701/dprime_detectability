@@ -92,7 +92,6 @@ class DPrimeDetectability(object):
     def d_prime_single_vals(self, plot=False):
         # integrate over frequency axis (after Buus et al. multiband model)
         freq_integration = np.sqrt(np.sum(self.d_prime()**2, 1))
-        print(freq_integration)
         if plot:
             plt.plot(freq_integration)
             plt.show()
@@ -100,7 +99,8 @@ class DPrimeDetectability(object):
         dp_50 = float(np.percentile(freq_integration, 50))
         dp_95 = float(np.percentile(freq_integration, 95))
         dp_max = float(np.max(freq_integration))
-        return dp_50, dp_95, dp_max
+        dp_int = float(np.sum(freq_integration))
+        return dp_50, dp_95, dp_max, dp_int
 
     def discounted_level(self, plot=False):
         l_disc = (20 * np.log10(np.sqrt(self.signal_spectrogram / 2e-5)) -
